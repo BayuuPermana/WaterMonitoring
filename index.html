@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 Environmental Data Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="antialiased text-gray-800">
+    <!-- Modal Structure -->
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <p id="infoModalMessage">This is a message.</p>
+            <button id="infoModalOkButton" class="modal-button">OK</button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="mb-6 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-700">ESP32 Environmental Data Dashboard</h1>
+            <p class="text-gray-500">Sensor Data Visualization & Analysis</p>
+        </header>
+
+        <!-- Tab Navigation -->
+        <div class="mb-6 border-b border-gray-300">
+            <nav class="flex -mb-px space-x-6" aria-label="Tabs">
+                <button id="tabDataCharts" type="button"
+                    class="tab-button active-tab group inline-flex items-center py-3 px-1 border-b-2 font-medium text-sm focus:outline-none">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path><path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path></svg>
+                    Data & Charts
+                </button>
+                <button id="tabSvm" type="button"
+                    class="tab-button inactive-tab group inline-flex items-center py-3 px-1 border-b-2 font-medium text-sm focus:outline-none">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                    SVM Analysis
+                </button>
+            </nav>
+        </div>
+
+        <!-- Tab Content -->
+        <div id="tabContentDataCharts" class="tab-content ">
+            <!-- Controls Section -->
+            <section id="controlsSection" class="mb-6 text-center space-x-2 sm:space-x-4">
+                <button id="refreshDataButton" class="action-button bg-green-600 hover:bg-green-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1 sm:mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm1.137 9.342a1 1 0 011.732.707A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.707-1.732z" clip-rule="evenodd" />
+                    </svg>
+                    Refresh Data
+                </button>
+                <button id="exportCsvButton" class="action-button bg-blue-600 hover:bg-blue-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1 sm:mr-2" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                    Export to CSV
+                </button>
+            </section>
+
+            <!-- Latest Readings Section -->
+            <section id="latestReadings" class="mb-8">
+                <h2 class="text-2xl font-semibold text-gray-700 mb-4">Latest Readings</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+                    <div class="card text-center">
+                        <div id="latestSuhu" class="metric-value">-</div>
+                        <div class="metric-label">Suhu (°C)</div>
+                    </div>
+                    <div class="card text-center">
+                        <div id="latestTDS" class="metric-value">-</div>
+                        <div class="metric-label">TDS (ppm)</div>
+                    </div>
+                    <div class="card text-center">
+                        <div id="latestSalinitas" class="metric-value">-</div>
+                        <div class="metric-label">Salinitas</div>
+                    </div>
+                    <div class="card text-center">
+                        <div id="latestPH" class="metric-value">-</div>
+                        <div class="metric-label">pH</div>
+                    </div>
+                    <div class="card text-center">
+                        <div id="latestTurbiditas" class="metric-value">-</div>
+                        <div class="metric-label">Turbiditas</div>
+                    </div>
+                    <div class="card text-center bg-gray-700 text-white">
+                        <div id="latestServerTimeStamp" class="text-lg font-medium">-</div>
+                        <div class="text-sm text-gray-300">Last Update (ServerTimeStamp)</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Charts Section -->
+            <section id="chartsSection">
+                <h2 class="text-2xl font-semibold text-gray-700 mb-6 text-center">Data Visualization Trends</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    <div class="card">
+                        <h3 class="text-lg font-semibold text-gray-600 mb-3 text-center">Suhu (°C)</h3>
+                        <div class="chart-container"><canvas id="suhuChart"></canvas></div>
+                    </div>
+                    <div class="card">
+                        <h3 class="text-lg font-semibold text-gray-600 mb-3 text-center">TDS (ppm)</h3>
+                        <div class="chart-container"><canvas id="tdsChart"></canvas></div>
+                    </div>
+                    <div class="card">
+                        <h3 class="text-lg font-semibold text-gray-600 mb-3 text-center">Salinitas</h3>
+                        <div class="chart-container"><canvas id="salinitasChart"></canvas></div>
+                    </div>
+                    <div class="card">
+                        <h3 class="text-lg font-semibold text-gray-600 mb-3 text-center">pH</h3>
+                        <div class="chart-container"><canvas id="phChart"></canvas></div>
+                    </div>
+                    <div class="card">
+                        <h3 class="text-lg font-semibold text-gray-600 mb-3 text-center">Turbiditas</h3>
+                        <div class="chart-container"><canvas id="turbiditasChart"></canvas></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div id="tabContentSvm" class="tab-content hidden">
+            <section class="mb-8">
+                <h2 class="text-2xl font-semibold text-gray-700 mb-4">Support Vector Machine (SVM) Analysis</h2>
+                <div class="card mb-6">
+                    <h3 class="text-xl font-semibold text-gray-600 mb-2">What is SVM?</h3>
+                    <div id="svmExplanation" class="text-gray-600 leading-relaxed prose max-w-none">
+                        <p>Loading explanation...</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3 class="text-xl font-semibold text-gray-600 mb-3">Potability Analysis</h3>
+                    <div id="svmPotabilityResult" class="text-center">
+                        <p class="text-gray-500 mb-2">Based on the latest sensor readings:</p>
+                        <!-- The percentage element is removed, result will be shown in the assessment div -->
+                        <div id="potabilityAssessment" class="text-md text-gray-700">-</div>
+                        <p class="text-xs text-gray-400 mt-3">Note: This analysis is based on the standards outlined in PERMENKES No. 492/2010.</p>
+                    </div>
+                     <button id="runSvmAnalysisButton" class="action-button bg-purple-600 hover:bg-purple-700 mt-4 mx-auto">
+                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01-.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path></svg>
+                        Run/Refresh Analysis
+                    </button>
+                </div>
+            </section>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator"
+            class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50 hidden">
+            <div class="text-white text-xl">Loading Data...</div>
+        </div>
+    </div>
+
+    <!-- Main Script (Module) -->
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
