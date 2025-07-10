@@ -1,0 +1,5 @@
+web spreadsheet : 
+https://script.google.com/macros/s/AKfycbzI-Z8_x_y7IX-iUJd3nko3GGvT0KR8PKD-YWbbiZi2ddedcqhooUPjTgffgTx0Oo2a/exec
+
+app id : 
+AKfycbzI-Z8_x_y7IX-iUJd3nko3GGvT0KR8PKD-YWbbiZi2ddedcqhooUPjTgffgTx0Oo2a
