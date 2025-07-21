@@ -12,8 +12,8 @@
 // --- Konfigurasi WiFi & Server ---
 const char* ssid_default = "watersen";
 const char* password_default = "12345678";
-const char* googleSheetWebAppUrl = "https://script.google.com/macros/s/AKfycbzI-Z8_x_y7IX-iUJd3nko3GGvT0KR8PKD-YWbbiZi2ddedcqhooUPjTgffgTx0Oo2a/exec"; // !!! GANTI INI !!!
-String apiKey = "AKfycbzI-Z8_x_y7IX-iUJd3nko3GGvT0KR8PKD-YWbbiZi2ddedcqhooUPjTgffgTx0Oo2a";
+const char* googleSheetWebAppUrl = "YOUR_GOOGLE_SHEET_WEB_APP_URL"; // !!! GANTI INI !!!
+String apiKey = "YOUR_API_KEY";
 
 // --- WiFiManager ---
 WiFiManager wm;

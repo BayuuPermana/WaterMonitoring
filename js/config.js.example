@@ -1,0 +1,17 @@
+// js/config.js
+
+// =================================================================================
+// CONFIGURATION CONSTANTS
+// =================================================================================
+// Replace with your actual Google Cloud API Key for Sheets API
+export const GOOGLE_SHEET_API_KEY = "YOUR_GOOGLE_SHEET_API_KEY"; // Example, use your key
+
+// Replace with your actual Google Spreadsheet ID
+export const SPREADSHEET_ID = "YOUR_SPREADSHEET_ID"; // Example, use your ID
+
+// Replace with your Sheet Name and the range that covers your data headers and values
+// Example: "Sheet1!A:H" if data is in Sheet1, columns A through H
+export const SHEET_NAME_AND_RANGE = "SensorData!A:H"; // Example, use your sheet name and range
+
+// How often to automatically poll for new data from the Google Sheet (in milliseconds)
+export const POLLING_INTERVAL_MS = 300000; // 300 seconds

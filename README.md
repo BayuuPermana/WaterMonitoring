@@ -79,6 +79,7 @@ The system consists of three main components:
 ### 3. Web Dashboard
 
 1.  **Configure `js/config.js`**:
+    - Create a copy of `js/config.js.example` and rename it to `js/config.js`.
     - Open `js/config.js`.
     - Set `GOOGLE_SHEET_API_KEY` to your Google Cloud Platform API Key with Google Sheets API enabled.
     - Set `SPREADSHEET_ID` to your Google Sheet ID.
@@ -95,13 +96,15 @@ The system consists of three main components:
 │   └── aman.ino             # Code for the ESP32 microcontroller
 ├── js/
 │   ├── chartManager.js      # Manages creation and updates of Chart.js charts
-│   ├── config.js            # API keys, spreadsheet IDs, and other settings
+│   ├── config.js            # API keys, spreadsheet IDs, and other settings (Ignored by Git)
+│   ├── config.js.example    # Example configuration file
 │   ├── dataService.js       # Handles fetching and parsing data from Google Sheets
 │   ├── main.js              # Main application logic, event listeners, and initialization
 │   ├── uiElements.js        # Selectors for all DOM elements
 │   └── utils.js             # Utility functions (e.g., CSV conversion)
 ├── index.html               # The main HTML structure of the dashboard
 ├── style.css                # Custom styles for the dashboard
-├── web spreadsheet.txt      # Contains key IDs and URLs for the backend setup
+├── web spreadsheet.txt      # Contains key IDs and URLs for the backend setup (Ignored by Git)
+├── web spreadsheet.txt.example # Example for web spreadsheet.txt
 └── README.md                # This documentation file
 ```
