@@ -4,10 +4,10 @@
 // CONFIGURATION CONSTANTS
 // =================================================================================
 // Replace with your actual Google Cloud API Key for Sheets API
-export const GOOGLE_SHEET_API_KEY = "example"; // Example, use your key
+export const GOOGLE_SHEET_API_KEY = "AIzaSyC3BLFgCM-fhJNAQdnYuEdYOcxFVb5DKpo"; // Example, use your key
 
 // Replace with your actual Google Spreadsheet ID
-export const SPREADSHEET_ID = "example"; // Example, use your ID
+export const SPREADSHEET_ID = "1yL96LSDQ8D-NsdigvxxzKVCH25ZMO3XQVOcAt396XYM"; // Example, use your ID
 
 // Replace with your Sheet Name and the range that covers your data headers and values
 // Example: "Sheet1!A:H" if data is in Sheet1, columns A through H
