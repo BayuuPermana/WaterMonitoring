@@ -1,0 +1,4 @@
+# Ignore configuration files with sensitive information
+js/config.js
+web spreadsheet.txt
+arduino/aman.ino
