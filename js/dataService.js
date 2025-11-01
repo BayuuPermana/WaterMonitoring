@@ -8,7 +8,7 @@ import { loadingIndicator } from './uiElements.js'; // For showing/hiding loadin
  * @param {string} timestampStr - The timestamp string from the 'ServerTimeStamp' column.
  * @returns {Date|null} A Date object or null if parsing fails.
  */
-function parseServerTimestamp(timestampStr) {
+export function parseServerTimestamp(timestampStr) {
     if (!timestampStr || typeof timestampStr !== 'string') {
         // console.warn('parseServerTimestamp: Input is null or not a string for parsing.');
         return null;

@@ -73,7 +73,7 @@ function displaySvmExplanation() {
  * Determines water potability based on a fixed set of rules from the research paper.
  * @param {object} latestData - The latest sensor data object.
  */
-function runPotabilityAnalysis(latestData) {
+export function runPotabilityAnalysis(latestData) {
     if (!potabilityAssessmentEl || !latestData) {
         if(potabilityAssessmentEl) {
             potabilityAssessmentEl.innerHTML = `<div class="text-gray-500">Awaiting data for analysis...</div>`;

@@ -3,3 +3,4 @@ js/config.js
 web spreadsheet.txt
 web spreadsheet.txt.example
 arduino/aman.ino
+tests/node_modules
