@@ -131,3 +131,12 @@ body {
     margin-bottom: 0.5em;
     font-weight: 600;
 }
+
+/* Prediction Result Colors */
+.text-green-600 {
+    color: #16a34a; /* Tailwind green-600 */
+}
+
+.text-red-600 {
+    color: #dc2626; /* Tailwind red-600 */
+}

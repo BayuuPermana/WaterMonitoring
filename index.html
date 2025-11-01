@@ -88,7 +88,7 @@
                     </div>
                     <div class="card text-center">
                         <div id="latestSalinitas" class="metric-value">-</div>
-                        <div class="metric-label">Salinitas</div>
+                        <div class="metric-label">Salinitas (ppt)</div>
                     </div>
                     <div class="card text-center">
                         <div id="latestPH" class="metric-value">-</div>
@@ -96,7 +96,7 @@
                     </div>
                     <div class="card text-center">
                         <div id="latestTurbiditas" class="metric-value">-</div>
-                        <div class="metric-label">Turbiditas</div>
+                        <div class="metric-label">Turbiditas (NTU)</div>
                     </div>
                     <div class="card text-center bg-gray-700 text-white">
                         <div id="latestServerTimeStamp" class="text-lg font-medium">-</div>
@@ -137,23 +137,66 @@
             <section class="mb-8">
                 <h2 class="text-2xl font-semibold text-gray-700 mb-4">Support Vector Machine (SVM) Analysis</h2>
                 <div class="card mb-6">
-                    <h3 class="text-xl font-semibold text-gray-600 mb-2">What is SVM?</h3>
-                    <div id="svmExplanation" class="text-gray-600 leading-relaxed prose max-w-none">
-                        <p>Loading explanation...</p>
+                    <h3 class="text-xl font-semibold text-gray-600 mb-2">Model Performance Metrics</h3>
+                    <p class="text-sm text-gray-500 mb-4">Based on an 80:20 train-test split.</p>
+                    <div class="grid grid-cols-1 gap-4">
+                        <div class="p-4 bg-blue-100 rounded-lg text-center">
+                            <div class="text-3xl font-bold text-blue-800">0.9934</div>
+                            <div class="text-sm text-blue-600">Accuracy</div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="p-4 bg-green-100 rounded-lg text-center">
+                                <div class="text-3xl font-bold text-green-800">1.00</div>
+                                <div class="text-sm text-green-600">Precision (Potable)</div>
+                            </div>
+                            <div class="p-4 bg-green-100 rounded-lg text-center">
+                                <div class="text-3xl font-bold text-green-800">0.96</div>
+                                <div class="text-sm text-green-600">Precision (Not Potable)</div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="p-4 bg-yellow-100 rounded-lg text-center">
+                                <div class="text-3xl font-bold text-yellow-800">0.99</div>
+                                <div class="text-sm text-yellow-600">Recall (Potable)</div>
+                            </div>
+                            <div class="p-4 bg-yellow-100 rounded-lg text-center">
+                                <div class="text-3xl font-bold text-yellow-800">1.00</div>
+                                <div class="text-sm text-yellow-600">Recall (Not Potable)</div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="p-4 bg-purple-100 rounded-lg text-center">
+                                <div class="text-3xl font-bold text-purple-800">1.00</div>
+                                <div class="text-sm text-purple-600">F1-score (Potable)</div>
+                            </div>
+                            <div class="p-4 bg-purple-100 rounded-lg text-center">
+                                <div class="text-3xl font-bold text-purple-800">0.98</div>
+                                <div class="text-sm text-purple-600">F1-score (Not Potable)</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
                 <div class="card">
-                    <h3 class="text-xl font-semibold text-gray-600 mb-3">Potability Analysis</h3>
-                    <div id="svmPotabilityResult" class="text-center">
-                        <p class="text-gray-500 mb-2">Based on the latest sensor readings:</p>
-                        <!-- The percentage element is removed, result will be shown in the assessment div -->
-                        <div id="potabilityAssessment" class="text-md text-gray-700">-</div>
-                        <p class="text-xs text-gray-400 mt-3">Note: This analysis is based on the standards outlined in PERMENKES No. 492/2010.</p>
+                    <h3 class="text-xl font-semibold text-gray-600 mb-3">Analyze Random Data</h3>
+                    <div class="text-center">
+                        <button id="analyze-random-data-button" class="action-button bg-purple-600 hover:bg-purple-700 mt-4">
+                            Fetch and Analyze Random Data
+                        </button>
                     </div>
-                     <button id="runSvmAnalysisButton" class="action-button bg-purple-600 hover:bg-purple-700 mt-4 mx-auto">
-                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01-.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path></svg>
-                        Run/Refresh Analysis
-                    </button>
+                    <div id="svm-selected-data" class="mt-6 hidden">
+                        <h3 class="text-xl font-semibold text-gray-600 mb-3">Data Used for Analysis</h3>
+                        <div class="card p-4">
+                            <div id="svm-selected-data-content" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700 mb-3"></div>
+                            <div id="svm-selected-timestamp" class="text-sm text-gray-500 text-right"></div>
+                        </div>
+                    </div>
+                    <div id="svm-result" class="mt-6 text-center hidden">
+                        <h3 class="text-xl font-semibold text-gray-600 mb-3">Prediction Result</h3>
+                        <div id="svm-prediction-card" class="p-4 rounded-lg">
+                            <p id="svm-prediction" class="text-4xl font-bold"></p>
+                        </div>
+                    </div>
                 </div>
             </section>
         </div>
