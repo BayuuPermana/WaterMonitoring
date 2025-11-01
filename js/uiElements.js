@@ -25,9 +25,11 @@ export const tabContentSvm = document.getElementById('tabContentSvm');
 
 // SVM Tab Specific
 export const svmExplanationEl = document.getElementById('svmExplanation');
-// export const potabilityPercentageEl = document.getElementById('potabilityPercentage'); // REMOVED
 export const potabilityAssessmentEl = document.getElementById('potabilityAssessment');
 export const runSvmAnalysisButtonEl = document.getElementById('runSvmAnalysisButton');
+export const modelFileInputEl = document.getElementById('modelFileInput');
+export const runRandomAnalysisButtonEl = document.getElementById('runRandomAnalysisButton');
+export const randomAnalysisResultEl = document.getElementById('randomAnalysisResult');
 
 
 // =================================================================================

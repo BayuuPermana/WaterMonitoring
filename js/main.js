@@ -5,6 +5,7 @@ import {
     latestServerTimeStampEl, exportCsvButton, refreshDataButtonEl, showModal,
     tabDataChartsButton, tabSvmButton, tabContentDataCharts, tabContentSvm,
     svmExplanationEl, potabilityAssessmentEl, runSvmAnalysisButtonEl,
+    modelFileInputEl, runRandomAnalysisButtonEl, randomAnalysisResultEl,
     loadingIndicator
 } from './uiElements.js';
 import { chartConfigs, createChart, updateAllCharts } from './chartManager.js';
@@ -229,6 +230,59 @@ async function handleExportDataToCSV() {
 // =================================================================================
 // EVENT LISTENERS
 // =================================================================================
+
+/**
+ * Simulates the prediction of an SVM model.
+ * @param {object} dataPoint - The sensor data object to analyze.
+ * @returns {string} The simulated prediction ('Layak' or 'Tidak Layak').
+ */
+function simulateSvmPrediction(dataPoint) {
+    // This is a placeholder. In a real scenario with a compatible model,
+    // this function would preprocess the data and run it through the model.
+    // The logic here is simplified for demonstration.
+    const { pH, TDS, Turbiditas } = dataPoint;
+    if (pH >= 6.5 && pH <= 8.5 && TDS <= 500 && Turbiditas <= 5) {
+        return 'Layak';
+    } else {
+        return 'Tidak Layak';
+    }
+}
+
+/**
+ * Fetches all data, picks a random data point, and runs the simulated SVM analysis.
+ */
+async function runSvmAnalysisWithRandomData() {
+    if (!randomAnalysisResultEl) return;
+
+    randomAnalysisResultEl.classList.remove('hidden');
+    randomAnalysisResultEl.innerHTML = `<div class="text-gray-500">Fetching data and analyzing...</div>`;
+
+    const allData = await fetchSheetData(true); // Fetch all data
+    if (allData.length === 0) {
+        randomAnalysisResultEl.innerHTML = `<div class="text-red-500">No data available to analyze.</div>`;
+        return;
+    }
+
+    const randomDataPoint = allData[Math.floor(Math.random() * allData.length)];
+    const prediction = simulateSvmPrediction(randomDataPoint);
+
+    const resultHTML = `
+        <h4 class="text-lg font-semibold text-gray-700 mb-2">Analysis of Random Data Point</h4>
+        <p class="text-sm text-gray-500 mb-3">Timestamp: ${randomDataPoint.ServerTimeStamp}</p>
+        <div class="grid grid-cols-3 gap-2 text-sm mb-4">
+            <div><strong>pH:</strong> ${randomDataPoint.pH.toFixed(2)}</div>
+            <div><strong>TDS:</strong> ${randomDataPoint.TDS.toFixed(0)}</div>
+            <div><strong>Turbidity:</strong> ${randomDataPoint.Turbiditas.toFixed(2)}</div>
+        </div>
+        <div class="mt-2">
+            <span class="text-md font-medium">Model Prediction:</span>
+            <span class="text-xl font-bold ${prediction === 'Layak' ? 'text-green-600' : 'text-red-600'}">${prediction}</span>
+        </div>
+    `;
+    randomAnalysisResultEl.innerHTML = resultHTML;
+}
+
+
 if(exportCsvButton) {
     exportCsvButton.addEventListener('click', handleExportDataToCSV);
 }
@@ -260,6 +314,10 @@ if (runSvmAnalysisButtonEl) {
             }
         }
     });
+}
+
+if (runRandomAnalysisButtonEl) {
+    runRandomAnalysisButtonEl.addEventListener('click', runSvmAnalysisWithRandomData);
 }
 
 
