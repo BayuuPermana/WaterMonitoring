@@ -61,7 +61,15 @@ export function createChart(canvasId, label, borderColor) {
             },
             plugins: { 
                 legend: { 
-                    display: false 
+                    display: true,
+                    position: 'bottom',
+                },
+                title: {
+                    display: true,
+                    text: label,
+                    font: {
+                        size: 16,
+                    },
                 },
                 tooltip: {
                     mode: 'index',
@@ -73,6 +81,16 @@ export function createChart(canvasId, label, borderColor) {
     });
     charts[canvasId] = chartInstance;
     return chartInstance;
+}
+
+/**
+ * Initializes all charts defined in chartConfigs.
+ */
+export function initializeAllCharts() {
+    Object.keys(chartConfigs).forEach(canvasId => {
+        const config = chartConfigs[canvasId];
+        createChart(canvasId, config.label, config.borderColor);
+    });
 }
 
 /**

@@ -15,3 +15,6 @@ export const SHEET_NAME_AND_RANGE = "SensorData!A:H"; // Example, use your sheet
 
 // How often to automatically poll for new data from the Google Sheet (in milliseconds)
 export const POLLING_INTERVAL_MS = 300000; // 300 seconds
+
+// The URL for the SVM prediction endpoint
+export const SVM_PREDICTION_ENDPOINT = 'http://127.0.0.1:5000/predict';
