@@ -7,7 +7,8 @@ import {
     svmExplanationEl, potabilityAssessmentEl, runSvmAnalysisButtonEl,
     loadingIndicator
 } from './uiElements.js';
-import { chartConfigs, createChart, updateAllCharts } from './chartManager.js';
+import { handleError } from './errorHandler.js';
+import { initializeAllCharts, updateAllCharts } from './chartManager.js';
 import { fetchSheetData } from './dataService.js';
 import { convertToCSV } from './utils.js';
 import { initSvmAnalysis } from './svmAnalysis.js';
@@ -19,30 +20,28 @@ export let latestSensorDataSnapshot = null;
 // TAB SWITCHING LOGIC
 // =================================================================================
 function switchTab(activeTabButton, activeTabContent) {
-    // Hide all tab contents
-    if(tabContentDataCharts) tabContentDataCharts.classList.add('hidden');
-    if(tabContentSvm) tabContentSvm.classList.add('hidden');
+    const tabButtons = [tabDataChartsButton, tabSvmButton];
+    const tabContents = [tabContentDataCharts, tabContentSvm];
 
-    // Deactivate all tab buttons
-    if(tabDataChartsButton) {
-        tabDataChartsButton.classList.remove('active-tab');
-        tabDataChartsButton.classList.add('inactive-tab');
-    }
-    if(tabSvmButton) {
-        tabSvmButton.classList.remove('active-tab');
-        tabSvmButton.classList.add('inactive-tab');
-    }
+    tabContents.forEach(content => {
+        if (content) content.classList.add('hidden');
+    });
 
-    // Activate the selected tab and content
+    tabButtons.forEach(button => {
+        if (button) {
+            button.classList.remove('active-tab');
+            button.classList.add('inactive-tab');
+        }
+    });
+
     if (activeTabButton) {
         activeTabButton.classList.remove('inactive-tab');
         activeTabButton.classList.add('active-tab');
     }
+
     if (activeTabContent) {
         activeTabContent.classList.remove('hidden');
     }
-
-
 }
 
 
@@ -139,8 +138,7 @@ if(exportCsvButton) {
 if (refreshDataButtonEl) {
     refreshDataButtonEl.addEventListener('click', () => {
         refreshDashboardData().catch(error => {
-            console.error("Error during manual refresh top-level call:", error);
-            showModal(`An unexpected error occurred during manual refresh: ${error.message}`);
+            handleError(error, `An unexpected error occurred during manual refresh: ${error.message}`);
             if(loadingIndicator) loadingIndicator.classList.add('hidden');
         });
     });
@@ -159,9 +157,7 @@ if (tabSvmButton && tabContentSvm) {
 // INITIALIZATION
 // =================================================================================
 async function initializeDashboard() {
-    Object.keys(chartConfigs).forEach(canvasId => {
-        createChart(canvasId, chartConfigs[canvasId].label, chartConfigs[canvasId].borderColor);
-    });
+    initializeAllCharts();
 
     if (GOOGLE_SHEET_API_KEY.startsWith("YOUR_")) {
          showModal("CRITICAL: Google Sheet API Key needs to be configured with your actual values in js/config.js.");

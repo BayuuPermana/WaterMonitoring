@@ -37,9 +37,18 @@ const infoModal = document.getElementById('infoModal');
 const infoModalMessage = document.getElementById('infoModalMessage');
 const infoModalOkButton = document.getElementById('infoModalOkButton');
 
-export function showModal(message) {
+export function showModal(message, type = 'info') {
     if (infoModalMessage && infoModal) {
         infoModalMessage.textContent = message;
+
+        const modalContent = infoModal.querySelector('.modal-content');
+        if (modalContent) {
+            modalContent.classList.remove('success', 'warning', 'error');
+            if (type !== 'info') {
+                modalContent.classList.add(type);
+            }
+        }
+
         infoModal.style.display = "block";
     } else {
         console.warn("Modal elements not found. Message:", message);

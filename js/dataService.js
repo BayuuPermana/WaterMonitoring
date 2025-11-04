@@ -1,6 +1,6 @@
 // js/dataService.js
 import { GOOGLE_SHEET_API_KEY, SPREADSHEET_ID, SHEET_NAME_AND_RANGE } from './config.js';
-import { showModal } from './uiElements.js'; // For showing error messages
+import { handleError } from './errorHandler.js';
 import { loadingIndicator } from './uiElements.js'; // For showing/hiding loading
 
 /**
@@ -43,12 +43,11 @@ function parseServerTimestamp(timestampStr) {
  */
 export async function fetchSheetData(fetchAll = false) {
     if (GOOGLE_SHEET_API_KEY.startsWith("YOUR_") || SPREADSHEET_ID.startsWith("YOUR_")) {
-         showModal("CRITICAL: Google Sheet API Key or Spreadsheet ID needs to be configured with your actual values in js/config.js.");
-         console.error("Google Sheet API Key or Spreadsheet ID not configured.");
-         if(loadingIndicator) loadingIndicator.classList.add('hidden');
-         return [];
+        handleError(new Error("Configuration Error"), "CRITICAL: Google Sheet API Key or Spreadsheet ID is not configured. Please set it in js/config.js.");
+        if (loadingIndicator) loadingIndicator.classList.add('hidden');
+        return [];
     }
-    if(loadingIndicator) loadingIndicator.classList.remove('hidden');
+    if (loadingIndicator) loadingIndicator.classList.remove('hidden');
 
     const rangeToFetch = fetchAll ? SHEET_NAME_AND_RANGE.split('!')[0] + "!A:Z" : SHEET_NAME_AND_RANGE;
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(rangeToFetch)}?key=${GOOGLE_SHEET_API_KEY}&majorDimension=ROWS`;
@@ -57,8 +56,8 @@ export async function fetchSheetData(fetchAll = false) {
         const response = await fetch(url);
         if (!response.ok) {
             const errorData = await response.json();
-            console.error("Error fetching Google Sheet data:", response.status, errorData);
-            showModal(`Error fetching data (Status ${response.status}): ${errorData.error?.message || response.statusText}`);
+            const errorMessage = `Error fetching data (Status ${response.status}): ${errorData.error?.message || response.statusText}`;
+            handleError(new Error(errorMessage), errorMessage);
             return [];
         }
         const json = await response.json();
@@ -93,8 +92,7 @@ export async function fetchSheetData(fetchAll = false) {
         return formattedData;
 
     } catch (error) {
-        console.error("Error in fetchSheetData:", error);
-        showModal(`Failed to fetch or parse sheet data: ${error.message}`);
+        handleError(error, `Failed to fetch or parse sheet data: ${error.message}`);
         return [];
     } finally {
         if(loadingIndicator) loadingIndicator.classList.add('hidden');

@@ -19,10 +19,16 @@ body {
 .card {
     background-color: white;
     border-radius: 0.75rem; /* Tailwind rounded-xl */
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Tailwind shadow-lg */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Tailwind shadow-md */
     padding: 1.5rem; /* p-6 */
     display: flex;
     flex-direction: column;
+    transition: all 0.3s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Tailwind shadow-lg */
 }
 
 /* Metric Value Styles (for latest readings) */
@@ -71,6 +77,19 @@ body {
     border-radius: 0.25rem;
     cursor: pointer;
     transition: background-color 0.2s;
+}
+
+.modal-content.success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+.modal-content.warning {
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+}
+.modal-content.error {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
 }
 .modal-button:hover {
     background-color: #45a049;
@@ -139,4 +158,19 @@ body {
 
 .text-red-600 {
     color: #dc2626; /* Tailwind red-600 */
+}
+
+/* Loader Styles */
+.loader {
+    border: 8px solid #f3f3f3; /* Light grey */
+    border-top: 8px solid #3498db; /* Blue */
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
