@@ -1,15 +1,16 @@
 // js/chartManager.js
+import { i18n } from './i18n.js';
 
 // This object will hold all chart instances, keyed by canvasId
 export const charts = {};
 
 // Configuration for each chart: label for y-axis, border color, and data key from sheet
 export const chartConfigs = {
-    suhuChart:       { label: 'Suhu (°C)',    borderColor: 'rgb(255, 99, 132)', dataKey: 'Suhu' },
-    tdsChart:        { label: 'TDS (ppm)',    borderColor: 'rgb(54, 162, 235)', dataKey: 'TDS' },
-    salinitasChart:  { label: 'Salinitas (ppt)',    borderColor: 'rgb(75, 192, 192)', dataKey: 'Salinitas' },
-    phChart:         { label: 'pH',           borderColor: 'rgb(153, 102, 255)',dataKey: 'pH' },
-    turbiditasChart: { label: 'Kekeruhan (NTU)',   borderColor: 'rgb(255, 159, 64)', dataKey: 'Turbiditas' }
+    suhuChart: { labelKey: 'tempLabel', borderColor: 'rgb(255, 99, 132)', dataKey: 'Suhu' },
+    tdsChart: { labelKey: 'tdsLabel', borderColor: 'rgb(54, 162, 235)', dataKey: 'TDS' },
+    salinitasChart: { labelKey: 'salinityLabel', borderColor: 'rgb(75, 192, 192)', dataKey: 'Salinitas' },
+    phChart: { labelKey: 'phLabel', borderColor: 'rgb(153, 102, 255)', dataKey: 'pH' },
+    turbiditasChart: { labelKey: 'turbidityLabel', borderColor: 'rgb(255, 159, 64)', dataKey: 'Turbiditas' }
 };
 
 /**
@@ -19,35 +20,41 @@ export const chartConfigs = {
  * @param {string} borderColor - The color of the line.
  * @returns {Chart} The Chart.js instance.
  */
-export function createChart(canvasId, label, borderColor) {
-    const ctx = document.getElementById(canvasId).getContext('2d');
+export function createChart(canvasId, labelKey, borderColor) {
+    const label = i18n.t(labelKey);
+    const canvasElement = document.getElementById(canvasId);
+    if (!canvasElement) {
+        console.error(`Canvas element with ID '${canvasId}' not found!`);
+        return null;
+    }
+    const ctx = canvasElement.getContext('2d');
     const chartInstance = new Chart(ctx, {
         type: 'line',
-        data: { 
+        data: {
             labels: [], // These will be populated with ServerTimeStamp strings
-            datasets: [{ 
-                data: [], 
-                borderColor: borderColor, 
-                borderWidth: 2, 
-                fill: false, 
+            datasets: [{
+                data: [],
+                borderColor: borderColor,
+                borderWidth: 2,
+                fill: false,
                 tension: 0.1,
                 pointRadius: 0,
                 pointHoverRadius: 5,
                 pointHitRadius: 10,
                 // spanGaps: 5 * 60 * 1000, // spanGaps behaves differently with category scale.
-                                          // It will span over null/undefined data points if true.
-                                          // If data is simply missing (no point for that category), it won't draw.
-                                          // Let's set it to false to break line on explicit nulls.
+                // It will span over null/undefined data points if true.
+                // If data is simply missing (no point for that category), it won't draw.
+                // Let's set it to false to break line on explicit nulls.
                 spanGaps: false
-            }] 
+            }]
         },
         options: {
-            responsive: true, 
+            responsive: true,
             maintainAspectRatio: false,
             scales: {
-                x: { 
+                x: {
                     type: 'category', // CHANGED from 'time'
-                    title: { display: true, text: 'Time (ServerTimeStamp - Categorical)' }, // Updated title
+                    title: { display: true, text: i18n.t('timeAxisLabel') }, // Updated title
                     ticks: {
                         autoSkip: true,
                         maxTicksLimit: 10, // Limit the number of visible ticks to avoid clutter
@@ -55,12 +62,12 @@ export function createChart(canvasId, label, borderColor) {
                         minRotation: 20
                     }
                 },
-                y: { 
-                    title: { display: true, text: label.split('(')[0].trim() } 
+                y: {
+                    title: { display: true, text: label.split('(')[0].trim() }
                 }
             },
-            plugins: { 
-                legend: { 
+            plugins: {
+                legend: {
                     display: true,
                     position: 'bottom',
                 },
@@ -89,7 +96,43 @@ export function createChart(canvasId, label, borderColor) {
 export function initializeAllCharts() {
     Object.keys(chartConfigs).forEach(canvasId => {
         const config = chartConfigs[canvasId];
-        createChart(canvasId, config.label, config.borderColor);
+        createChart(canvasId, config.labelKey, config.borderColor);
+    });
+
+    i18n.subscribe(() => {
+        updateChartLabels();
+    });
+}
+
+function updateChartLabels() {
+    Object.keys(charts).forEach(canvasId => {
+        const chart = charts[canvasId];
+        const config = chartConfigs[canvasId];
+        if (chart && config) {
+            const newLabel = i18n.t(config.labelKey);
+
+            // Update dataset label
+            // Note: Chart.js dataset label is usually not shown in legend if only one dataset, 
+            // but we are using title plugin for the main label.
+            // Wait, the createChart uses 'label' for y-axis title and title plugin text.
+
+            // Update Y-axis title
+            if (chart.options.scales.y.title) {
+                chart.options.scales.y.title.text = newLabel.split('(')[0].trim();
+            }
+
+            // Update Chart Title
+            if (chart.options.plugins.title) {
+                chart.options.plugins.title.text = newLabel;
+            }
+
+            // Update X-axis title
+            if (chart.options.scales.x.title) {
+                chart.options.scales.x.title.text = i18n.t('timeAxisLabel');
+            }
+
+            chart.update();
+        }
     });
 }
 
@@ -103,7 +146,7 @@ export function updateAllCharts(dataArray) {
     const allDataForChart = dataArray; // dataArray is already sorted oldest first
 
     // For category scale, labels are the ServerTimeStamp strings
-    const labels = allDataForChart.map(doc => doc.ServerTimeStamp || 'N/A'); 
+    const labels = allDataForChart.map(doc => doc.ServerTimeStamp || 'N/A');
 
     Object.keys(charts).forEach(key => { // key here is canvasId like 'suhuChart'
         if (charts[key] && chartConfigs[key]) {

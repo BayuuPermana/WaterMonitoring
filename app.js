@@ -1,4 +1,7 @@
 import { showModal, loadingIndicator } from './js/uiElements.js';
+import { i18n } from './js/i18n.js';
+
+i18n.init();
 
 async function initialize() {
     try {

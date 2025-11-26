@@ -1,6 +1,7 @@
 import { latestSensorDataSnapshot } from './main.js';
 import { SVM_PREDICTION_ENDPOINT } from './config.js';
 import { handleError } from './errorHandler.js';
+import { i18n } from './i18n.js';
 
 /**
  * Updates the UI to display the data selected for SVM analysis.
@@ -14,26 +15,26 @@ function updateSelectedDataUI(data) {
     svmSelectedDataContent.innerHTML = `
         <div class="p-3 bg-gray-50 rounded-lg text-center">
             <div class="text-2xl font-bold">${data.Suhu?.toFixed(1) ?? '-'} °C</div>
-            <div class="text-sm text-gray-600">Suhu</div>
+            <div class="text-sm text-gray-600">${i18n.t('temp')}</div>
         </div>
         <div class="p-3 bg-gray-50 rounded-lg text-center">
             <div class="text-2xl font-bold">${data.TDS?.toFixed(0) ?? '-'} ppm</div>
-            <div class="text-sm text-gray-600">TDS</div>
+            <div class="text-sm text-gray-600">${i18n.t('tds')}</div>
         </div>
         <div class="p-3 bg-gray-50 rounded-lg text-center">
-            <div class="text-2xl font-bold">${data.Salinitas?.toFixed(1) ?? '-'}</div>
-            <div class="text-sm text-gray-600">Salinitas</div>
+            <div class="text-2xl font-bold">${data.Salinitas?.toFixed(1) ?? '-'} </div>
+            <div class="text-sm text-gray-600">${i18n.t('salinity')}</div>
         </div>
         <div class="p-3 bg-gray-50 rounded-lg text-center">
-            <div class="text-2xl font-bold">${data.pH?.toFixed(1) ?? '-'}</div>
-            <div class="text-sm text-gray-600">pH</div>
+            <div class="text-2xl font-bold">${data.pH?.toFixed(1) ?? '-'} </div>
+            <div class="text-sm text-gray-600">${i18n.t('ph')}</div>
         </div>
         <div class="p-3 bg-gray-50 rounded-lg text-center">
-            <div class="text-2xl font-bold">${data.Turbiditas?.toFixed(0) ?? '-'}</div>
-            <div class="text-sm text-gray-600">Turbiditas</div>
+            <div class="text-2xl font-bold">${data.Turbiditas?.toFixed(0) ?? '-'} </div>
+            <div class="text-sm text-gray-600">${i18n.t('turbidity')}</div>
         </div>
     `;
-    svmSelectedTimestamp.textContent = `Timestamp: ${data.ServerTimeStamp}`;
+    svmSelectedTimestamp.textContent = `${i18n.t('timestampLabel')}${data.ServerTimeStamp}`;
     svmSelectedData.classList.remove('hidden');
 }
 
@@ -50,10 +51,10 @@ function updatePredictionUI(prediction) {
     svmPredictionCard.classList.remove('bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800');
 
     if (prediction === 1) {
-        svmPrediction.textContent = 'Potable';
+        svmPrediction.textContent = i18n.t('potable');
         svmPredictionCard.classList.add('bg-green-100', 'text-green-800');
     } else {
-        svmPrediction.textContent = 'Not Potable';
+        svmPrediction.textContent = i18n.t('notPotable');
         svmPredictionCard.classList.add('bg-red-100', 'text-red-800');
     }
     svmResult.classList.remove('hidden');
@@ -76,24 +77,20 @@ async function fetchPrediction(features) {
     if (!response.ok) {
         throw new Error('Network response was not ok');
     }
-
     return await response.json();
 }
 
 /**
  * Handles the SVM analysis process.
+ * Fetches prediction first, then updates UI with selected data and prediction metrics.
  */
 async function handleSvmAnalysis() {
     if (!latestSensorDataSnapshot || latestSensorDataSnapshot.length === 0) {
         handleError(new Error('No data available'), 'No data available from the \'Data & Charts\' tab. Please refresh the data first.');
         return;
     }
-
     const randomIndex = Math.floor(Math.random() * latestSensorDataSnapshot.length);
     const randomData = latestSensorDataSnapshot[randomIndex];
-
-    updateSelectedDataUI(randomData);
-
     const features = [
         randomData.Suhu,
         randomData.TDS,
@@ -101,19 +98,21 @@ async function handleSvmAnalysis() {
         randomData.pH,
         randomData.Turbiditas,
     ];
-
     try {
-        const data = await fetchPrediction(features);
-        updatePredictionUI(data.prediction);
+        const result = await fetchPrediction(features);
+        updateSelectedDataUI(randomData);
+        updatePredictionUI(result.prediction);
     } catch (error) {
         handleError(error, 'An error occurred during SVM analysis. Please check the console for details.');
     }
 }
 
 /**
- * Initializes the SVM analysis feature.
+ * Initializes SVM analysis by setting up event listeners.
  */
 export function initSvmAnalysis() {
     const analyzeButton = document.getElementById('analyze-random-data-button');
-    analyzeButton.addEventListener('click', handleSvmAnalysis);
+    if (analyzeButton) {
+        analyzeButton.addEventListener('click', handleSvmAnalysis);
+    }
 }

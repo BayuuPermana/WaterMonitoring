@@ -54,23 +54,23 @@ function updateLatestReadingsUI(dataArray) {
         const latestData = dataArray[0];
         latestSensorDataSnapshot = dataArray; // Store for SVM tab
 
-        if(latestSuhuEl) latestSuhuEl.textContent = latestData.Suhu?.toFixed(1) ?? na;
-        if(latestTDSEl) latestTDSEl.textContent = latestData.TDS?.toFixed(0) ?? na;
-        if(latestSalinitasEl) latestSalinitasEl.textContent = latestData.Salinitas?.toFixed(1) ?? na;
-        if(latestPHEl) latestPHEl.textContent = latestData.pH?.toFixed(1) ?? na;
-        if(latestTurbiditasEl) latestTurbiditasEl.textContent = latestData.Turbiditas?.toFixed(0) ?? na;
-        if(latestServerTimeStampEl) latestServerTimeStampEl.textContent = latestData.ServerTimeStamp || na;
+        if (latestSuhuEl) latestSuhuEl.textContent = latestData.Suhu?.toFixed(1) ?? na;
+        if (latestTDSEl) latestTDSEl.textContent = latestData.TDS?.toFixed(0) ?? na;
+        if (latestSalinitasEl) latestSalinitasEl.textContent = latestData.Salinitas?.toFixed(1) ?? na;
+        if (latestPHEl) latestPHEl.textContent = latestData.pH?.toFixed(1) ?? na;
+        if (latestTurbiditasEl) latestTurbiditasEl.textContent = latestData.Turbiditas?.toFixed(0) ?? na;
+        if (latestServerTimeStampEl) latestServerTimeStampEl.textContent = latestData.ServerTimeStamp || na;
 
 
 
     } else {
         latestSensorDataSnapshot = null;
-        if(latestSuhuEl) latestSuhuEl.textContent = na;
-        if(latestTDSEl) latestTDSEl.textContent = na;
-        if(latestSalinitasEl) latestSalinitasEl.textContent = na;
-        if(latestPHEl) latestPHEl.textContent = na;
-        if(latestTurbiditasEl) latestTurbiditasEl.textContent = na;
-        if(latestServerTimeStampEl) latestServerTimeStampEl.textContent = na;
+        if (latestSuhuEl) latestSuhuEl.textContent = na;
+        if (latestTDSEl) latestTDSEl.textContent = na;
+        if (latestSalinitasEl) latestSalinitasEl.textContent = na;
+        if (latestPHEl) latestPHEl.textContent = na;
+        if (latestTurbiditasEl) latestTurbiditasEl.textContent = na;
+        if (latestServerTimeStampEl) latestServerTimeStampEl.textContent = na;
 
     }
 }
@@ -79,14 +79,14 @@ function updateLatestReadingsUI(dataArray) {
 // DATA REFRESH LOGIC
 // =================================================================================
 async function refreshDashboardData() {
-    const sensorData = await fetchSheetData(); 
-    
+    const sensorData = await fetchSheetData();
+
     if (sensorData.length > 0) {
         updateLatestReadingsUI(sensorData);
-        updateAllCharts(sensorData.slice().reverse()); 
+        updateAllCharts(sensorData.slice().reverse());
     } else {
-         updateLatestReadingsUI([]);
-         updateAllCharts([]);
+        updateLatestReadingsUI([]);
+        updateAllCharts([]);
     }
 }
 
@@ -96,16 +96,16 @@ async function refreshDashboardData() {
 async function handleExportDataToCSV() {
     const exportModalMessage = "Fetching all data for export... This may take a moment.";
     showModal(exportModalMessage);
-    const allData = await fetchSheetData(true); 
+    const allData = await fetchSheetData(true);
 
     if (allData.length === 0) {
-        if (document.getElementById('infoModalMessage').textContent !== exportModalMessage) { 
+        if (document.getElementById('infoModalMessage').textContent !== exportModalMessage) {
         } else {
             showModal("No data available to export.");
         }
         return;
     }
-    const sortedDataForCSV = allData.slice().sort((a,b) => a.chartTimestamp.getTime() - b.chartTimestamp.getTime()); 
+    const sortedDataForCSV = allData.slice().sort((a, b) => a.chartTimestamp.getTime() - b.chartTimestamp.getTime());
     const csvData = convertToCSV(sortedDataForCSV);
     const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
@@ -131,7 +131,7 @@ async function handleExportDataToCSV() {
 // =================================================================================
 // EVENT LISTENERS
 // =================================================================================
-if(exportCsvButton) {
+if (exportCsvButton) {
     exportCsvButton.addEventListener('click', handleExportDataToCSV);
 }
 
@@ -139,7 +139,7 @@ if (refreshDataButtonEl) {
     refreshDataButtonEl.addEventListener('click', () => {
         refreshDashboardData().catch(error => {
             handleError(error, `An unexpected error occurred during manual refresh: ${error.message}`);
-            if(loadingIndicator) loadingIndicator.classList.add('hidden');
+            if (loadingIndicator) loadingIndicator.classList.add('hidden');
         });
     });
 }
@@ -160,11 +160,11 @@ async function initializeDashboard() {
     initializeAllCharts();
 
     if (GOOGLE_SHEET_API_KEY.startsWith("YOUR_")) {
-         showModal("CRITICAL: Google Sheet API Key needs to be configured with your actual values in js/config.js.");
-         if(loadingIndicator) loadingIndicator.classList.add('hidden');
-         return;
+        showModal("CRITICAL: Google Sheet API Key needs to be configured with your actual values in js/config.js.");
+        if (loadingIndicator) loadingIndicator.classList.add('hidden');
+        return;
     }
-    
+
     // Set initial active tab
     switchTab(tabDataChartsButton, tabContentDataCharts);
 
@@ -174,4 +174,9 @@ async function initializeDashboard() {
     setInterval(refreshDashboardData, POLLING_INTERVAL_MS);
 }
 
-initializeDashboard();
+// Wait for DOM to be ready before initializing
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeDashboard);
+} else {
+    initializeDashboard();
+}
