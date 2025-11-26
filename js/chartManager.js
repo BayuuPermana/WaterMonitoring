@@ -33,6 +33,7 @@ export function createChart(canvasId, labelKey, borderColor) {
         data: {
             labels: [], // These will be populated with ServerTimeStamp strings
             datasets: [{
+                label: label,
                 data: [],
                 borderColor: borderColor,
                 borderWidth: 2,
@@ -53,13 +54,24 @@ export function createChart(canvasId, labelKey, borderColor) {
             maintainAspectRatio: false,
             scales: {
                 x: {
-                    type: 'category', // CHANGED from 'time'
-                    title: { display: true, text: i18n.t('timeAxisLabel') }, // Updated title
+                    type: 'category',
+                    title: { display: true, text: i18n.t('timeAxisLabel') },
                     ticks: {
                         autoSkip: true,
-                        maxTicksLimit: 10, // Limit the number of visible ticks to avoid clutter
-                        maxRotation: 70,   // Rotate labels if they overlap
-                        minRotation: 20
+                        maxTicksLimit: 8,
+                        maxRotation: 45,
+                        minRotation: 0,
+                        callback: function (value, index, ticks) {
+                            // Format: show only time portion (HH:MM:SS) for cleaner look
+                            const label = this.getLabelForValue(value);
+                            if (label && label !== 'N/A') {
+                                const parts = label.split(' ');
+                                if (parts.length >= 2) {
+                                    return parts[1]; // Return time portion only
+                                }
+                            }
+                            return label;
+                        }
                     }
                 },
                 y: {
@@ -80,8 +92,16 @@ export function createChart(canvasId, labelKey, borderColor) {
                 },
                 tooltip: {
                     mode: 'index',
-                    intersect: false
-                    // Tooltip will show the category label (ServerTimeStamp string)
+                    intersect: false,
+                    callbacks: {
+                        title: function (tooltipItems) {
+                            // Show full timestamp in tooltip
+                            if (tooltipItems.length > 0) {
+                                return tooltipItems[0].label;
+                            }
+                            return '';
+                        }
+                    }
                 }
             }
         }
@@ -112,9 +132,9 @@ function updateChartLabels() {
             const newLabel = i18n.t(config.labelKey);
 
             // Update dataset label
-            // Note: Chart.js dataset label is usually not shown in legend if only one dataset, 
-            // but we are using title plugin for the main label.
-            // Wait, the createChart uses 'label' for y-axis title and title plugin text.
+            if (chart.data.datasets[0]) {
+                chart.data.datasets[0].label = newLabel;
+            }
 
             // Update Y-axis title
             if (chart.options.scales.y.title) {
